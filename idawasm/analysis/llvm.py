@@ -247,7 +247,7 @@ class LLVMAnalyzer(idawasm.analysis.Analyzer):
             - offset (int): offset into the bitcode of the reference instruction.
             - parameter (int, optional): the parameter index being loaded.
         '''
-        buf = ida_bytes.get_many_bytes(function['offset'], function['size'])
+        buf = ida_bytes.get_bytes(function['offset'], function['size'])
         bc = list(wasm.decode.decode_bytecode(buf))
 
         offset = function['offset']
@@ -294,7 +294,7 @@ class LLVMAnalyzer(idawasm.analysis.Analyzer):
         if function['size'] <= self.PROLOGUE_SIZE:
             return False
 
-        prologue = ida_bytes.get_many_bytes(function['offset'], self.PROLOGUE_SIZE)
+        prologue = ida_bytes.get_bytes(function['offset'], self.PROLOGUE_SIZE)
         prologue_bc = list(itertools.islice(wasm.decode.decode_bytecode(prologue), 8))
         prologue_mnems = list(map(lambda bc: bc.op.id, prologue_bc))
 
@@ -333,7 +333,7 @@ class LLVMAnalyzer(idawasm.analysis.Analyzer):
         if not self.has_llvm_prologue(function):
             return
 
-        buf = ida_bytes.get_many_bytes(function['offset'], self.PROLOGUE_SIZE)
+        buf = ida_bytes.get_bytes(function['offset'], self.PROLOGUE_SIZE)
         bc = list(itertools.islice(wasm.decode.decode_bytecode(buf), 8))
 
         global_frame_pointer = bc[0].imm.global_index
@@ -343,7 +343,7 @@ class LLVMAnalyzer(idawasm.analysis.Analyzer):
         # add a frame structure to the function
         f = ida_funcs.get_func(function['offset'])
         ida_frame.add_frame(f, 0x0, 0x0, frame_size)
-        ida_struct.set_struc_name(f.frame, ('frame%d' % function['index']).encode('utf-8'))
+        ida_struct.set_struc_name(f.frame, ('frame%d' % function['index']))
 
         # ensure global variable $frame_stack is named appropriately
         ida_name.set_name(self.proc.globals[global_frame_pointer]['offset'], '$frame_stack')

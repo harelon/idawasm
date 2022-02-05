@@ -522,7 +522,7 @@ def main():
         logger.error('range must be selected')
         return -1
 
-    sel_end = idc.NextHead(sel_end)
+    sel_end = idc.next_head(sel_end)
 
     buf = ida_bytes.get_bytes(sel_start, sel_end - sel_start)
     if buf is None:
@@ -552,8 +552,8 @@ def main():
     frame = {}
     if f.frame != idc.BADADDR:
         names = set([])
-        for i in range(idc.GetStrucSize(f.frame)):
-            name = idc.GetMemberName(f.frame, i)
+        for i in range(idc.get_struc_size(f.frame)):
+            name = idc.get_member_name(f.frame, i)
             if not name:
                 continue
             if name in names:
